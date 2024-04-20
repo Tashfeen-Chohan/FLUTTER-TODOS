@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todos/models/todo.dart';
 
 class TodoItem extends StatelessWidget {
-  const TodoItem({super.key});
+  const TodoItem({super.key, required this.todo});
+  final Todo todo;
 
   @override
   Widget build(BuildContext context) {
@@ -13,12 +15,17 @@ class TodoItem extends StatelessWidget {
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         onTap: () {},
-        leading: const Icon(
-          Icons.check_box,
-          color: Color.fromARGB(255, 11, 126, 220),
+        leading: Icon(
+          todo.isDone ? Icons.check_box : Icons.check_box_outline_blank,
+          color: Colors.deepPurple,
           size: 25,
         ),
-        title: const Text("Check Todo Task"),
+        title: Text(todo.todoTask,
+            style: TextStyle(
+              decoration: todo.isDone
+                  ? TextDecoration.lineThrough
+                  : TextDecoration.none,
+            )),
         trailing: const Icon(
           Icons.delete,
           color: Colors.red,

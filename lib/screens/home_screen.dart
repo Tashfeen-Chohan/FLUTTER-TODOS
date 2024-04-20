@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todos/models/todo.dart';
 import 'package:flutter_todos/widgets/todo_item.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+  final todoList = Todo.todoList();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: myAppBar(),
       backgroundColor: const Color.fromARGB(255, 226, 226, 226),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showDialog(context);
+        },
+        backgroundColor: Colors.deepPurple,
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+      ),
       body: Column(
         children: [
           const SizedBox(
@@ -20,23 +32,59 @@ class HomeScreen extends StatelessWidget {
           ),
           Expanded(
             child: ListView(
-              children: const [
-                Padding(
+              children: [
+                const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                   child: Text(
                     "ALL TODOS",
                     style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                   ),
                 ),
-                TodoItem(),
-                TodoItem(),
-                TodoItem(),
+                for (Todo item in todoList) TodoItem(todo: item)
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<dynamic> _showDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+            title: const Text("Add New Task"),
+            content: const TextField(
+              decoration: InputDecoration(
+                  label: Text("TODO Task"),
+                  hintText: "Enter todo task here...",
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.task_alt_rounded)),
+            ),
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {},
+                    child: const Text("Save"),
+                  ),
+                  const SizedBox(
+                    width: 7,
+                  ),
+                  OutlinedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Cancel")),
+                ],
+              )
+            ],
+          );
+        });
   }
 
   AppBar myAppBar() {

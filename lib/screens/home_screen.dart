@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_todos/models/todo.dart';
 import 'package:flutter_todos/widgets/todo_item.dart';
@@ -12,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final todoList = Todo.todoList();
   List<Todo> _foundTodo = [];
+  bool searchTodo = false;
   final _todoController = TextEditingController();
 
   @override
@@ -24,17 +27,19 @@ class _HomeScreenState extends State<HomeScreen> {
   void runFilter(String searchQuery) {
     List<Todo> results = [];
     if (searchQuery.isEmpty) {
-      results = _foundTodo;
+      setState(() {
+        _foundTodo = todoList;
+      });
     } else {
       results = todoList
           .where((element) => element.todoTask
               .toLowerCase()
               .contains(searchQuery.toLowerCase()))
           .toList();
+      setState(() {
+        _foundTodo = results;
+      });
     }
-    setState(() {
-      _foundTodo = results;
-    });
   }
 
   void _handleTodoChange(Todo todo) {
@@ -131,26 +136,38 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 30,
           ),
           Expanded(
-            child: ListView(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                  child: Text(
-                    "ALL TODOS",
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            child: _foundTodo.isEmpty
+                ? const Center(
+                    child: Text(
+                      "No todo found!",
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.deepPurple,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  )
+                : ListView(
+                    children: [
+                      const Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                        child: Text(
+                          "ALL TODOS",
+                          style: TextStyle(
+                              fontSize: 25, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      for (Todo item in _foundTodo.reversed)
+                        TodoItem(
+                          todo: item,
+                          onTodoChange: _handleTodoChange,
+                          onDeleteItem: _handleDeleteItem,
+                        ),
+                      const SizedBox(
+                        height: 70,
+                      )
+                    ],
                   ),
-                ),
-                for (Todo item in _foundTodo.reversed)
-                  TodoItem(
-                    todo: item,
-                    onTodoChange: _handleTodoChange,
-                    onDeleteItem: _handleDeleteItem,
-                  ),
-                const SizedBox(
-                  height: 70,
-                )
-              ],
-            ),
           ),
         ],
       ),
